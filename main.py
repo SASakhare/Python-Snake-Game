@@ -2,30 +2,48 @@ import pygame
 import time
 from pygame.locals import *
 
-SIZE=40
+SIZE = 40
+
+
+class Apple:
+
+    def __init__(self, game_screen):
+
+        self.apple = pygame.image.load("./resources/apple.jpg")
+        self.game_screen = game_screen
+
+        self.x, self.y = SIZE * 3, SIZE * 3  # * should be multiple of 40
+
+    def draw(self):
+
+        self.game_screen.blit(self.apple, (self.x, self.y))
+        pygame.display.flip()
+
+
 class Snake:
 
-    def __init__(self, game_screen, bg_color: tuple[int], Height: int, Weight: int,length:int):
+    def __init__(
+        self, game_screen, bg_color: tuple[int], Height: int, Weight: int, length: int
+    ):
 
-        self.length=length
+        self.length = length
         self.game_screen = game_screen
         self.block = pygame.image.load("./resources/block.jpg").convert()
-        self.x, self.y =[SIZE]*self.length,[SIZE]*self.length
+        self.x, self.y = [SIZE] * self.length, [SIZE] * self.length
         self.bg_color = bg_color
         self.Height, self.Weight = Height, Weight
         self.dir = None
-        self.delta=40
+        self.delta = 40
 
     def draw(self):
 
         self.game_screen.fill(self.bg_color)
-        for x,y in zip(self.x,self.y):
+        for x, y in zip(self.x, self.y):
             self.game_screen.blit(self.block, (x, y))
         pygame.display.flip()
 
-
     def move_up(self):
-        self.y[0] -=self.delta
+        self.y[0] -= self.delta
         self.y[0] = max(self.y[0], 5)
         self.draw()
 
@@ -46,11 +64,11 @@ class Snake:
 
     def walk(self):
 
-        for i in range(self.length-1,0,-1):
+        for i in range(self.length - 1, 0, -1):
 
-            self.x[i]=self.x[i-1]
-            self.y[i]=self.y[i-1]
-            
+            self.x[i] = self.x[i - 1]
+            self.y[i] = self.y[i - 1]
+
         if self.dir == "up":
             self.move_up()
         elif self.dir == "down":
@@ -72,8 +90,16 @@ class Game:
         self.surface = pygame.display.set_mode((self.Weight, self.Height))
         self.surface.fill(bg_color)
 
-        self.snake = Snake(self.surface, bg_color, Height, Weight,10)
+        self.snake = Snake(self.surface, bg_color, Height, Weight, 10)
         self.snake.draw()
+
+        self.apple = Apple(self.surface)
+        self.apple.draw()
+
+    def play(self):
+
+        self.snake.walk()
+        self.apple.draw()
 
     def run(self):
 
@@ -102,7 +128,7 @@ class Game:
                 elif event.type == QUIT:
                     running = False
 
-            self.snake.walk()
+            self.play()
             time.sleep(0.5)
 
 
